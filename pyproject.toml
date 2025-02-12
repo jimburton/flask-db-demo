@@ -12,6 +12,7 @@ build-backend = "flit_core.buildapi"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath="."
 
 [tool.coverage.run]
 branch = true
