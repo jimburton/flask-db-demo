@@ -5,11 +5,10 @@
 {% endblock %}
 
 {% block content %}
-  <form method="post">
-    <label for="username">Username</label>
-    <input name="username" id="username" required>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password" required>
+  <form action="{{ url_for('auth.register') }}" method="post">
+    {{ form.hidden_tag() }}
+    {{ form.username.label }} {{ form.username(size=20) }} <br />
+    {{ form.password.label }} {{ form.password(size=20) }} <br />
     <input type="submit" value="Register">
   </form>
 {% endblock %}

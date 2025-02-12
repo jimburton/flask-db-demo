@@ -12,3 +12,7 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+bin/
+lib/	
+lib64
+pyvenv.cfg
