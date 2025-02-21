@@ -1,7 +1,7 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, session, url_for
+    Blueprint, flash, g, redirect, render_template, session, url_for, current_app
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
@@ -14,6 +14,7 @@ bp = Blueprint('auth', __name__, url_prefix='/auth')
 
 @bp.route('/register', methods=('GET', 'POST'))
 def register():
+    """View for registering a user."""
     form = UserForm()
     if form.validate_on_submit():
         user = User()
@@ -38,6 +39,7 @@ def register():
 
 @bp.route('/login', methods=('GET', 'POST'))
 def login():
+    """View for logging in."""
     form = UserForm()
     if form.validate_on_submit():
         db_session = get_session()
@@ -46,6 +48,7 @@ def login():
             .query(User)
             .filter(User.username == form.username.data)
             .scalar())
+        current_app.logger.debug(f'{user.username}')
         error = None
         if user is None:
             error = 'Incorrect username.'
@@ -63,20 +66,24 @@ def login():
 
 @bp.before_app_request
 def load_logged_in_user():
+    """Hook that puts the logged in user into the session.""" 
     user_id = session.get('user_id')
 
     if user_id is None:
         g.user = None
     else:
         g.user = get_session().query(User).filter(User.user_id == user_id).scalar()
+        session['user_id'] = user_id
 
 
 @bp.route('/logout')
 def logout():
+    """View for logging out."""
     session.clear()
     return redirect(url_for('index'))
 
 def login_required(view):
+    """Decorator that wraps views for which we need a logged in user."""
     @functools.wraps(view)
     def wrapped_view(**kwargs):
         if g.user is None:

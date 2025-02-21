@@ -3,13 +3,13 @@ from wtforms import StringField, SubmitField, PasswordField, IntegerField, TextA
 from wtforms.validators import DataRequired
 
 class UserForm(FlaskForm):
-    username = StringField('name')
-    password = PasswordField('password')
+    username = StringField('name', validators=[DataRequired()])
+    password = PasswordField('password', validators=[DataRequired()])
     submit = SubmitField("Submit")
 
 class PostForm(FlaskForm):
     _id    = IntegerField()
     title  = StringField('title', validators=[DataRequired()])
-    body   = TextAreaField('body')
+    body   = TextAreaField('body', validators=[DataRequired()])
     submit = SubmitField("Save")
 
