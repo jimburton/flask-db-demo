@@ -1,13 +1,12 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, session, url_for
+    Blueprint, flash, g, redirect, render_template, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from flaskr.db import get_db, get_session
+from flaskr.db import get_session
 from flaskr.forms import UserForm
-from sqlalchemy import and_
 from sqlalchemy.exc import IntegrityError 
 from flaskr.model import User
 
@@ -22,6 +21,11 @@ def register():
         user.password = generate_password_hash(form.password.data)
         db_session = get_session()
         db_session.add(user)
+
+        if user.username is None:
+            flash(f"User {form.username.data} is missing.")
+        if user.password is None:
+            flash(f"User {form.password.data} is missing.")
         
         try:
             db_session.commit()
@@ -29,7 +33,7 @@ def register():
             flash(f"User {form.username.data} is already registered.")
         else:
             return redirect(url_for("auth.login"))
-
+    print("Form was not valid")
     return render_template('auth/register.html', form=form)
 
 @bp.route('/login', methods=('GET', 'POST'))

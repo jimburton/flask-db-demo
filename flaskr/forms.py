@@ -3,8 +3,8 @@ from wtforms import StringField, SubmitField, PasswordField, IntegerField, TextA
 from wtforms.validators import DataRequired
 
 class UserForm(FlaskForm):
-    username = StringField('name', validators=[DataRequired()])
-    password = PasswordField('password', validators=[DataRequired()])
+    username = StringField('name')
+    password = PasswordField('password')
     submit = SubmitField("Submit")
 
 class PostForm(FlaskForm):

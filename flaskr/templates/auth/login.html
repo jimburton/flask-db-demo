@@ -6,9 +6,9 @@
 
 {% block content %}
   <form action="{{ url_for('auth.login') }}" method="post">
-    {{ form.hidden_tag() }}
+    <!-- form.hidden_tag() -->
     {{ form.username.label }} {{ form.username(size=20) }} <br />
     {{ form.password.label }} {{ form.password(size=20) }} <br />
-    <input type="submit" value="Log In">
+    <input type="submit" id="login_button" value="Log In">
   </form>
 {% endblock %}

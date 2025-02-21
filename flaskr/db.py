@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 import click
 from flask import current_app, g
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 def init_app(app):
