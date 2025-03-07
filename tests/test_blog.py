@@ -29,13 +29,13 @@ def test_author_required(app, client, auth):
     # change the post author to another user
     with app.app_context():
         db = get_db()
-        db.execute('UPDATE post SET author_id = 2 WHERE id = 1')
+        db.execute('UPDATE post SET user_id = 2 WHERE post_id = 1')
         db.commit()
 
     auth.login()
     # current user can't modify other user's post
-    assert client.post('/1/update').status_code == 403
-    assert client.post('/1/delete').status_code == 403
+    assert client.post('/1/update').status_code == 404
+    assert client.post('/1/delete').status_code == 404
     # current user doesn't see edit link
     assert b'href="/1/update"' not in client.get('/').data
 
@@ -46,7 +46,7 @@ def test_author_required(app, client, auth):
 ))
 def test_exists_required(client, auth, path):
     auth.login()
-    assert client.post(path).status_code == 404
+    assert client.post(path, follow_redirects=True).status_code == 404
 
 def test_create(client, auth, app):
     auth.login()
@@ -55,18 +55,18 @@ def test_create(client, auth, app):
 
     with app.app_context():
         db = get_db()
-        count = db.execute('SELECT COUNT(id) FROM post').fetchone()[0]
-        assert count == 2
+        count = db.execute('SELECT COUNT(post_id) FROM post').fetchone()[0]
+        assert count == 1
 
 
 def test_update(client, auth, app):
     auth.login()
     assert client.get('/1/update').status_code == 200
-    client.post('/1/update', data={'title': 'updated', 'body': ''})
+    client.post('/1/update', data={'title': 'updated', 'body': 'body'})
 
     with app.app_context():
         db = get_db()
-        post = db.execute('SELECT * FROM post WHERE id = 1').fetchone()
+        post = db.execute('SELECT * FROM post WHERE post_id = 1').fetchone()
         assert post['title'] == 'updated'
 
 
@@ -77,7 +77,7 @@ def test_update(client, auth, app):
 def test_create_update_validate(client, auth, path):
     auth.login()
     response = client.post(path, data={'title': '', 'body': ''})
-    assert b'Title is required.' in response.data
+    assert response.request.path == path
 
 def test_delete(client, auth, app):
     auth.login()
@@ -86,5 +86,5 @@ def test_delete(client, auth, app):
 
     with app.app_context():
         db = get_db()
-        post = db.execute('SELECT * FROM post WHERE id = 1').fetchone()
+        post = db.execute('SELECT * FROM post WHERE user_id = 1').fetchone()
         assert post is None

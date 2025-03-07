@@ -34,7 +34,6 @@ def register():
             flash(f"User {form.username.data} is already registered.")
         else:
             return redirect(url_for("auth.login"))
-    print("Form was not valid")
     return render_template('auth/register.html', form=form)
 
 @bp.route('/login', methods=('GET', 'POST'))
@@ -48,13 +47,12 @@ def login():
             .query(User)
             .filter(User.username == form.username.data)
             .scalar())
-        current_app.logger.debug(f'{user.username}')
+        #current_app.logger.debug(f'{user.username}')
         error = None
         if user is None:
             error = 'Incorrect username.'
         elif not check_password_hash(user.password, form.password.data):
             error = 'Incorrect password.'
-
         if error is None:
             session.clear()
             session['user_id'] = user.user_id

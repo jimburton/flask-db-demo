@@ -2,12 +2,14 @@ import os
 import tempfile
 
 import pytest
+import flask
+from flask.testing import FlaskClient as BaseFlaskClient
+from flask_wtf.csrf import generate_csrf
 from flaskr import create_app
 from flaskr.db import get_db, init_db
 
 with open(os.path.join(os.path.dirname(__file__), 'data.sql'), 'rb') as f:
     _data_sql = f.read().decode('utf8')
-
 
 @pytest.fixture
 def app():
@@ -17,7 +19,9 @@ def app():
         'TESTING': True,
         'DATABASE': db_path,
         'SECRET_KEY': 'test',
+        'WTF_CSRF_ENABLED': False,
     })
+    #app.test_client_class = FlaskClient
 
     with app.app_context():
         init_db()
@@ -45,7 +49,8 @@ class AuthActions(object):
     def login(self, username='test', password='test'):
         return self._client.post(
             '/auth/login',
-            data={'username': username, 'password': password}
+            data={'username': username, 'password': password},
+            follow_redirects = True
         )
 
     def logout(self):

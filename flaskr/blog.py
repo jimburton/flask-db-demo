@@ -1,5 +1,5 @@
 from flask import (
-    Blueprint, g, redirect, render_template, url_for
+    Blueprint, g, redirect, render_template, url_for, flash, session
 )
 from werkzeug.exceptions import abort
 from sqlalchemy import desc
@@ -43,19 +43,24 @@ def update(id):
     form = PostForm()
     db_session = get_session()
     post = db_session.query(Post).filter(Post.post_id == id).scalar()
-    if form.validate_on_submit():
+    if post and post.user_id != session['user_id']:
+        return render_template('errors/404.html'), 404
+    if form.validate_on_submit() and post:
         title = form.title.data
         body = form.body.data
         db_session = get_session()
-        post = db_session.query(Post).filter(Post.post_id == id).scalar()
         post.title = title
         post.body = body
         db_session.commit()
         return redirect(url_for('blog.index'))
-    else:
+    elif post:
         form.title.data = post.title
         form.body.data  = post.body
         return render_template('blog/update.html', title='Update', id=id, form=form)
+    else:
+        flash('Invalid id')
+        return render_template('errors/404.html'), 404
+        
 
 @bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
@@ -63,6 +68,9 @@ def delete(id):
     """View for removing a post."""
     db_session = get_session()
     post = db_session.query(Post).filter(Post.post_id == id).scalar()
-    db_session.delete(post)
-    db_session.commit()
-    return redirect(url_for('blog.index'))
+    if not post or post.user_id != session['user_id']:
+        return render_template('errors/404.html'), 404
+    else:
+        db_session.delete(post)
+        db_session.commit()
+        return redirect(url_for('blog.index'))

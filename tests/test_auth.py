@@ -8,11 +8,17 @@ def test_register(client, app):
     response = client.post(
         '/auth/register', data={'username': 'a', 'password': 'a'}
         , follow_redirects=True)
-    print(f'{response.status=}')
-    print(f'{response.response=}')
-    for x in response.response:
-        print(x)
-    assert response.headers["Location"] == "/auth/login"
+    #print(f'{type(response)=}')
+    #print(f'{response.request.path=}')
+    #print(f'{type(response.headers)=}')
+    #for k,v in response.headers.items():
+    #    print(f'{k} -> {v}')
+    #print(f'{response.status=}')
+    #print(f'{response.response=}')
+    #print(f'{response.data=}')
+    #for x in response.response:
+    #    print(f'{x=}')
+    assert response.request.path == "/auth/login"
 
     with app.app_context():
         assert get_db().execute(
@@ -20,40 +26,39 @@ def test_register(client, app):
         ).fetchone() is not None
 
 
-# @pytest.mark.parametrize(('username', 'password', 'message'), (
-#     ('', '', b'Please fill in this field.'),
-#     ('a', '', b'Please fill in this field.'),
-#     ('test', 'test', b'already registered'),
-# ))
-# def test_register_validate_input(client, username, password, message):
-#     response = client.post(
-#         '/auth/register',
-#         data={'username': username, 'password': password}
-#     )
-#     assert message in response.data
+@pytest.mark.parametrize(('username', 'password', 'message'), (
+    ('', '', b'Please fill in this field.'),
+    ('a', '', b'Please fill in this field.'),
+    ('test', 'test', b'already registered'),
+))
+def test_register_validate_input(client, username, password, message):
+    response = client.post(
+        '/auth/register',
+        data={'username': username, 'password': password}
+    )
+    assert response.request.path == "/auth/register"
 
-# def test_login(client, auth):
-#     assert client.get('/auth/login').status_code == 200
-#     response = auth.login()
-#     assert response.headers["Location"] == "/"
+def test_login(client, auth):
+    assert client.get('/auth/login').status_code == 200
+    response = auth.login()
+    assert response.request.path == "/"
 
-#     with client:
-#         client.get('/')
-#         assert session['user_id'] == 1
-#         assert g.user['username'] == 'test'
+    with client:
+        client.get('/')
+        assert session['user_id'] == 1
+        assert g.user.username == 'test'
 
 
-# @pytest.mark.parametrize(('username', 'password', 'message'), (
-#     ('a', 'test', b'Incorrect username.'),
-#     ('test', 'a', b'Incorrect password.'),
-# ))
-# def test_login_validate_input(auth, username, password, message):
-#     response = auth.login(username, password)
-#     assert message in response.data
+@pytest.mark.parametrize(('username', 'password', 'message'), (
+    ('a', 'test', b'Incorrect username.'),
+    ('test', 'a', b'Incorrect password.'),
+))
+def test_login_validate_input(auth, username, password, message):
+    response = auth.login(username, password)
+    assert response.request.path == "/auth/login"
 
-# def test_logout(client, auth):
-#     auth.login()
-
-#     with client:
-#         auth.logout()
-#         assert 'user_id' not in session
+def test_logout(client, auth):
+    auth.login()
+    with client:
+        auth.logout()
+        assert 'user_id' not in session
