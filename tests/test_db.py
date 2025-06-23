@@ -1,10 +1,15 @@
+"""
+Test the database.
+"""
 import sqlite3
 
 import pytest
+# pylint: disable=import-error,too-few-public-methods
 from flaskr.db import get_db
 
 
 def test_get_close_db(app):
+    """ Test we can get a connection to the database and close it."""
     with app.app_context():
         db = get_db()
         assert db is get_db()
@@ -15,7 +20,9 @@ def test_get_close_db(app):
     assert 'closed' in str(e.value)
 
 def test_init_db_command(runner, monkeypatch):
-    class Recorder(object):
+    """ Test the command for initialising the database."""
+    class Recorder:
+        """ Mock object for the db."""
         called = False
 
     def fake_init_db():

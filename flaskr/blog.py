@@ -1,13 +1,17 @@
+"""
+Views relating to the blog functionality.
+"""
 from flask import (
     Blueprint, g, redirect, render_template, url_for, flash, session
 )
-from werkzeug.exceptions import abort
 from sqlalchemy import desc
 from sqlalchemy.sql.functions import now
 from flaskr.auth import login_required
 from flaskr.db import get_session
 from flaskr.forms import PostForm
 from flaskr.model import Post
+
+# pylint: disable=redefined-builtin
 
 bp = Blueprint('blog', __name__)
 
@@ -53,14 +57,13 @@ def update(id):
         post.body = body
         db_session.commit()
         return redirect(url_for('blog.index'))
-    elif post:
+    if post:
         form.title.data = post.title
         form.body.data  = post.body
         return render_template('blog/update.html', title='Update', id=id, form=form)
-    else:
-        flash('Invalid id')
-        return render_template('errors/404.html'), 404
-        
+    flash('Invalid id')
+    return render_template('errors/404.html'), 404
+
 
 @bp.route('/<int:id>/delete', methods=('POST',))
 @login_required
@@ -70,7 +73,6 @@ def delete(id):
     post = db_session.query(Post).filter(Post.post_id == id).scalar()
     if not post or post.user_id != session['user_id']:
         return render_template('errors/404.html'), 404
-    else:
-        db_session.delete(post)
-        db_session.commit()
-        return redirect(url_for('blog.index'))
+    db_session.delete(post)
+    db_session.commit()
+    return redirect(url_for('blog.index'))

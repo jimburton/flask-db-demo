@@ -1,13 +1,15 @@
+"""
+Views for the Admin functionality.
+"""
 import functools
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, session, url_for
 )
 from werkzeug.security import check_password_hash, generate_password_hash
-
+from sqlalchemy.exc import IntegrityError
 from flaskr.db import get_session
 from flaskr.forms import UserForm
-from sqlalchemy.exc import IntegrityError 
 from flaskr.model import User
 
 bp = Blueprint('auth', __name__, url_prefix='/auth')
@@ -27,7 +29,7 @@ def register():
             flash(f"User {form.username.data} is missing.")
         if user.password is None:
             flash(f"User {form.password.data} is missing.")
-        
+
         try:
             db_session.commit()
         except IntegrityError:

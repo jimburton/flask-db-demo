@@ -1,8 +1,13 @@
+"""
+Test the blog functionality.
+"""
 import pytest
+# pylint: disable=import-error
 from flaskr.db import get_db
 
 
 def test_index(client, auth):
+    """ Test the home page."""
     response = client.get('/')
     assert b"Log In" in response.data
     assert b"Register" in response.data
@@ -21,12 +26,13 @@ def test_index(client, auth):
     '/1/delete',
 ))
 def test_login_required(client, path):
+    """ Test that we need to be logged in to create, update and delete posts."""
     response = client.post(path)
     assert response.headers["Location"] == "/auth/login"
 
 
 def test_author_required(app, client, auth):
-    # change the post author to another user
+    """ Test that users cannot modify another user's posts."""
     with app.app_context():
         db = get_db()
         db.execute('UPDATE post SET user_id = 2 WHERE post_id = 1')
@@ -45,10 +51,12 @@ def test_author_required(app, client, auth):
     '/2/delete',
 ))
 def test_exists_required(client, auth, path):
+    """ Test that we get a 404 when modifying non-existent posts."""
     auth.login()
     assert client.post(path, follow_redirects=True).status_code == 404
 
 def test_create(client, auth, app):
+    """ Test that we can create a post."""
     auth.login()
     assert client.get('/create').status_code == 200
     client.post('/create', data={'title': 'created', 'body': ''})
@@ -60,6 +68,7 @@ def test_create(client, auth, app):
 
 
 def test_update(client, auth, app):
+    """ Test that we can update a post."""
     auth.login()
     assert client.get('/1/update').status_code == 200
     client.post('/1/update', data={'title': 'updated', 'body': 'body'})
@@ -75,11 +84,13 @@ def test_update(client, auth, app):
     '/1/update',
 ))
 def test_create_update_validate(client, auth, path):
+    """ Test the input validation on the forms for creating and updating posts."""
     auth.login()
     response = client.post(path, data={'title': '', 'body': ''})
     assert response.request.path == path
 
 def test_delete(client, auth, app):
+    """ Test that we can delete a post."""
     auth.login()
     response = client.post('/1/delete')
     assert response.headers["Location"] == "/"
