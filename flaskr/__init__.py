@@ -16,7 +16,6 @@ def create_app(test_config=None):
         app.config.from_pyfile('config.py', silent=True)
     else:
         # load the test config if passed in
-        app.logger.debug(f'{test_config["WTF_CSRF_ENABLED"]=}')
         app.config.from_mapping(test_config)
 
     # ensure the instance folder exists

@@ -2,9 +2,6 @@ import os
 import tempfile
 
 import pytest
-import flask
-from flask.testing import FlaskClient as BaseFlaskClient
-from flask_wtf.csrf import generate_csrf
 from flaskr import create_app
 from flaskr.db import get_db, init_db
 

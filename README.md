@@ -1,7 +1,9 @@
 # Flask, WTF Forms & SQLAlchemy example
 
-The flask tutorial from https://flask.palletsprojects.com/en/stable/tutorial/ 
-adapted to use [WTForms](https://wtforms.readthedocs.io/en/3.2.x/) and [SQLAlchemy](https://www.sqlalchemy.org/).
+The flask tutorial from
+https://flask.palletsprojects.com/en/stable/tutorial/ adapted to use
+[WTForms](https://wtforms.readthedocs.io/en/3.2.x/) and
+[SQLAlchemy](https://www.sqlalchemy.org/).
 
 ## Install the requirements
 
