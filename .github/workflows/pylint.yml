@@ -20,4 +20,4 @@ jobs:
         path: "requirements.txt"
     - name: Analysing the code with pylint
       run: |
-        pylint $(git ls-files '*.py')
+        python -m pylint $(git ls-files '*.py')
