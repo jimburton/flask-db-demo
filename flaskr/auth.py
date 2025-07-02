@@ -93,5 +93,3 @@ def login_required(view):
 
     return wrapped_view
 
-def delete_me():
-    pass
